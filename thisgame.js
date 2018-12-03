@@ -134,6 +134,8 @@ class RootObject {
 };
 
 // ====================================================== CHARACTERS ================>
+var powerStore = 0;
+var specialStore = 0;
 
 class Character extends RootObject {
     constructor(stats) {
@@ -143,11 +145,11 @@ class Character extends RootObject {
         this.weapon = stats.weapon;
         this.faction = stats.faction;
         this.power = stats.power;
+        this.saying = stats.saying;
         this.special = stats.special;
-    };
-
-    takeDamage () {
-        return `${this.name} took damage!`; // show the damage taken and how much hp left
+        this.maxPower = this.power;
+        this.maxSpecial = this.special;
+        this.specialWeapon = stats.specialWeapon;
     };
 
     greet (){
@@ -155,57 +157,109 @@ class Character extends RootObject {
     };
 
     attack(enemy) {
-        let damage = (Math.floor(Math.random() * this.power) + 5);
-        enemy.health = enemy.health - damage;
-        this.health = this.health - (damage/2);
-        this.power = this.power - (damage/2.5);
+        if (this.power <= 0) {
+            this.power = 1;
+        };
+        let damage = (Math.floor(Math.random() * this.power) + 1);
+            console.log(Math.floor(this.power));
+            console.log(this.maxPower);
+        enemy.health = Math.floor(enemy.health - damage);
+            console.log(enemy.health)
+        this.health = Math.floor(this.health - (damage/2));
+        this.power = Math.floor(this.power - (damage/2));
+        powerStore = this.power;
+            console.log(powerStore);
+            console.log(damage);
+            console.log(damage/2);
+            console.log(this.health);
+            console.log(this.power);
         if (this.health <= 0) {
-            return this.destroy();
+            return `${this.destroy()} ${enemy.greet()}`;
         } else if (enemy.health <= 0) {
-            return this.destroy();
+            return `${enemy.destroy()} ${this.greet()}`;
         } else if (enemy.health < 30 && enemy.health > 1){
-            return `${enemy.name}'s health is low, ATTACK!!! Health remains: ${enemy.health} points. ${this.name} health: ${this.health}`
+            return `${enemy.name}'s health is low. Health remains: ${enemy.health} points. ${this.name} health: ${this.health}`;
+        } else if (Math.sign(this.power) === -1) {
+            this.power = 0;
+            return `${this.name} attacked ${enemy.name} with ${this.weapon}. ${enemy.name}: ${enemy.health} health left! ${this.name}: ${this.health} health left!`;
         } else {
         return `${this.name} attacked ${enemy.name} with ${this.weapon}. ${enemy.name}: ${enemy.health} health left! ${this.name}: ${this.health} health left!`;
         };
     };
+    
+    useSpecial(enemy) {
+        let specialPowerDamage = Math.floor((Math.random() * this.special) * 1.2);
+        enemy.health = Math.floor(enemy.health - specialPowerDamage);
+        this.health = Math.floor(this.health - (specialPowerDamage/3));
+        this.special = Math.floor(this.special - (specialPowerDamage/2.5));
+        specialStore = this.special;
+            console.log(specialPowerDamage);
+            console.log(enemy.health);
+            console.log(this.health);
+            console.log(this.special);
+            console.log(specialPowerDamage/2.5);
+            console.log(specialStore);
+
+        if (this.health <= 0) {
+            return `${this.destroy()} ${enemy.greet()}`;
+        } else if (enemy.health <= 0) {
+            return `You Just used ${this.specialWeapon} on ${enemy.name}. ${enemy.destroy()} ${this.greet()}`;
+        } else if (enemy.health < 30 && enemy.health > 5){
+            return `You Just used ${this.specialWeapon}. ${enemy.name}'s health is low. Health remains: ${enemy.health} points. ${this.name} health: ${this.health}`
+        } else {
+            return `${this.name} attacked ${enemy.name} with ${this.specialWeapon}. ${enemy.name}: ${enemy.health} health left! ${this.name}: ${this.health} health left!`;
+        };
+    }; 
 
     heal() {
-        let regenerate = (Math.floor(Math.random() * this.power) + 10);
-        let regenSpecial = (Math.floor(Math.random() * this.special) + 10);
+        
+            console.log(this.power);
+        let regenerate = (Math.floor(Math.random() * this.maxPower) + 10);
+        let regenSpecial = (Math.floor(Math.random() * regenerate) + 1);
         this.health = this.health + regenerate;
-        this.power = this.power + regenerate;
-        this.special = this.special + regenSpecial;
-        if (this.health > 100) {
+        this.power = powerStore + regenSpecial;
+        this.special = specialStore + regenSpecial; 
+            console.log(regenerate);
+            console.log(regenSpecial)
+            console.log(this.power);
+            console.log(this.maxPower);
+            console.log(this.health);
+            console.log(this.special);
+            console.log(this.maxSpecial);
+            console.log(powerStore);
+            console.log(specialStore);
+        
+        
+        while (this.health > 100) {
             this.health = 100;
-            return `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`;
-        } else if (this.power > 100) {
-            this.power = 100;
-            return `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`;
-        } else if (this.special > 100) {
-            this.special = 100;
+        } while (this.power > this.maxPower) {
+            this.power = this.maxPower;
+        } if (this.special > this.maxSpecial) {
+            this.special = this.maxSpecial
             return `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`;
         } else {
             return `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`;
-        };
+        };     
+
+        
+        // if (this.health > 100) {
+        //     this.health = 100;
+        //     console.log( `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`);
+            
+        // } else if (this.power > this.maxPower || this.special > maxSpecial) {
+        //     this.power = this.maxPower;
+        //     this.special = maxSpecial
+        //     console.log( `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`);
+            
+        // } else if (this.special > maxSpecial) {
+        //     this.special = maxSpecial;
+        //     console.log( `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`);
+        // } else {
+        //     return `${this.name} used Heal. Health: ${this.health}, Power: ${this.power}, Special: ${this.special}`;  
+        // };
     };
 
-    useSpecial(enemy) {
-        let specialPowerDamage = (Math.floor(Math.random() * this.special) * 1.5);
-        enemy.health = enemy.health - specialPowerDamage;
-        this.health = this.health - (specialPowerDamage/2);
-        this.special = this.special - (specialPowerDamage/2.5);
-        if (this.health <= 0) {
-            return this.destroy();
-        } else if (enemy.health <= 0) {
-            return this.destroy();
-        } else if (enemy.health < 30 && enemy.health > 1){
-            return `You Just used ${this.special}. ${enemy.name}'s health is low, ATTACK!!! Health remains: ${enemy.health} points. ${this.name} health: ${this.health}`
-        } else {
-        return `${this.name} attacked ${enemy.name} with ${this.special}. ${enemy.name}: ${enemy.health} health left! ${this.name}: ${this.health} health left!`;
-        };
-    };
-};
+}; 
 
 const thanos = new Character({
     createdAt: new Date(),
@@ -218,9 +272,10 @@ const thanos = new Character({
     name: 'Thanos',
     faction: 'Titan',
     weapon: 'Gauntlet',
-    saying: 'I am Lord THANOS!',
-    special: 30,
-    power: 20
+    saying: 'I will crush you!',
+    special: 40,
+    specialWeapon: 'Infinity Stones',
+    power: 20,
 });
 
 const hulk = new Character({
@@ -233,21 +288,36 @@ const hulk = new Character({
     health: 100,
     name: 'Hulk',
     faction: 'Avengers',
-    weapon: 'Smash Fury',
-    saying: 'Dont get me Angry!',
+    weapon: 'Smash',
+    saying: 'You wouldn\'t like me when im angry!',
     special: 50,
-    power: 20
+    specialWeapon: 'Fury',
+    power: 30,
+    
 });
 
-let obj = thanos;
-let obj2 = hulk;
+let obj2 = thanos; 
+let obj = hulk;
 
 console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
-console.log(obj2.attack(obj));
-console.log(thanos.heal());
-console.log(obj2.attack(obj));
+console.log(obj2.useSpecial(obj));
 console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
+console.log(obj.heal());
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+console.log(obj2.attack(obj));
+

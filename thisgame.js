@@ -212,7 +212,6 @@ class Character extends RootObject {
     }; 
 
     heal() {
-        
             console.log(this.power);
         let regenerate = (Math.floor(Math.random() * this.maxPower) + 10);
         let regenSpecial = (Math.floor(Math.random() * regenerate) + 1);
@@ -259,8 +258,32 @@ class Character extends RootObject {
         // };
     };
 
+    
+
 }; 
 
+//=================================================================== CREATOR FUNCTION ==========================================>
+
+function createChar(name, faction, weapon, specialWeapon, saying) {
+    return new Character({
+        createdAt: new Date(),
+        dimensions: {
+            length: 2,
+            width: 2,
+            height: 4,
+        },
+        health: 100,
+        name: name,
+        faction: faction,
+        weapon: weapon,
+        saying: saying,
+        special: 40,
+        specialWeapon: specialWeapon,
+        power: 20,
+    })
+};
+
+//=================================================================== CHARACTERS ================================================>
 const thanos = new Character({
     createdAt: new Date(),
     dimensions: {
@@ -321,3 +344,14 @@ console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
 console.log(obj2.attack(obj));
 
+
+console.log(createChar());
+
+const x = 3;
+function sum(x,y) {
+    x = x + y;
+    return x;
+};
+
+console.log(sum(x,4))
+console.log(x)
